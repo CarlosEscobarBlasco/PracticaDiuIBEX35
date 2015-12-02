@@ -441,7 +441,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         if(jComboBox1.getSelectedItem().toString()!=null)
-        fillPut(jComboBox1.getSelectedItem().toString());
+        fillCall(jComboBox1.getSelectedItem().toString());
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
