@@ -212,9 +212,20 @@ public class Cartera extends javax.swing.JPanel {
          jTable1.setValueAt(opcion.Tipo, i, 1);
          jTable1.setValueAt(opcion.Vencimiento, i, 2);
          jTable1.setValueAt(opcion.Ejercicio, i, 3);
-         jTable1.setValueAt(opcion.Vencimiento, i, 4);
+         jTable1.setValueAt(opcion.DiaDeCompra, i, 4);
          jTable1.setValueAt(opcion.Venta_Precio, i, 5);
+         jTable1.setValueAt(opcion.Compra_Precio, i, 6);
+         jTable1.setValueAt(calcularGanancia(opcion.Compra_Precio, opcion.Venta_Precio), i, 7);
          i++;
         }
+    }
+    
+    private String calcularGanancia(String compra, String venta){
+        try{
+            return (Float.parseFloat(compra.replace(",", "."))-Float.parseFloat(venta.replace(",", ".")))+"";
+        }catch(Exception e){
+            
+        }
+        return "-";
     }
 }
