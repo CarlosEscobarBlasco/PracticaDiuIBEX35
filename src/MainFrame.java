@@ -4,31 +4,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import javax.swing.JTable;
 import javax.swing.Timer;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author Juan
- */
 public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+        this.carteras = new ArrayList<>();
+        this.listasPorVencimientoCall = new HashMap<>();
+        this.listasPorVencimientoPut = new HashMap<>();
         initComponents();
 
         setDate();
@@ -45,13 +36,12 @@ public class MainFrame extends javax.swing.JFrame {
         );
         timData.start();
 
-        CollectOptions();
+        obtenerOpciones();
         Timer timeOption = new Timer(180000, (ActionEvent evt) -> {
-            CollectOptions();
+            obtenerOpciones();
         } // 3 minutos
         );
         timeOption.start();
-        activateTablesListenner();
     }
 
     /**
@@ -88,6 +78,7 @@ public class MainFrame extends javax.swing.JFrame {
         BarraMenu = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         AñadirCartera = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -206,7 +197,7 @@ public class MainFrame extends javax.swing.JFrame {
             VentanaFuturosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(VentanaFuturosLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 140, Short.MAX_VALUE))
+                .addGap(0, 148, Short.MAX_VALUE))
         );
 
         VentanaOpcionesCALL.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -276,7 +267,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -347,7 +338,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -429,6 +420,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(AñadirCartera);
 
+        jMenuItem1.setText("Abrir Cartera");
+        jMenu1.add(jMenuItem1);
+
         BarraMenu.add(jMenu1);
 
         jMenu2.setText("Edit");
@@ -470,13 +464,13 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
         if (jComboBox2.getSelectedItem().toString() != null) {
-            fillPut(jComboBox2.getSelectedItem().toString());
+            rellenarPUT(jComboBox2.getSelectedItem().toString());
         }
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         if (jComboBox1.getSelectedItem().toString() != null) {
-            fillCall(jComboBox1.getSelectedItem().toString());
+            rellenarCALL(jComboBox1.getSelectedItem().toString());
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
@@ -554,6 +548,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -565,10 +560,10 @@ public class MainFrame extends javax.swing.JFrame {
     private final MEFF_Contado contado = new MEFF_Contado();
     private final MEFF_Futuros futuros = new MEFF_Futuros();
     private final MEFF_Opciones opciones = new MEFF_Opciones();
-    private HashMap<String, ArrayList<Opcion>> listasPorVencimientoCall = new HashMap<>();
-    private HashMap<String, ArrayList<Opcion>> listasPorVencimientoPut = new HashMap<>();
+    private final HashMap<String, ArrayList<Opcion>> listasPorVencimientoCall;
+    private final HashMap<String, ArrayList<Opcion>> listasPorVencimientoPut;
     private int numeroDeCartera = 0;
-    private ArrayList<Cartera> carteras = new ArrayList<>();
+    private final ArrayList<Cartera> carteras;
 
     private void setDate() {
         Date date = new Date();
@@ -586,7 +581,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void CollectData() {
-
         contado.getSpot();
         TableModel model = TablaContado.getModel();
         TablaContado.setValueAt(contado.Spot, 0, 0);
@@ -628,24 +622,24 @@ public class MainFrame extends javax.swing.JFrame {
         //Notificaciones.setText("Datos disponibles");
     }
 
-    private void CollectOptions() {
+    private void obtenerOpciones() {
         if (opciones.getOptions()) {
             int nOpciones = opciones.Opciones.size();
             for (int i = 0; i < nOpciones; i++) {
                 if (opciones.Opciones.get(i).Tipo.equals("CALL")) {
-                    collectCall(opciones.Opciones.get(i));
+                    obtenerCALLS(opciones.Opciones.get(i));
                 } else {
-                    collectPut(opciones.Opciones.get(i));
+                    obtenerPUTS(opciones.Opciones.get(i));
                 }
             }
-            setEndDate();
-            fillOptions();
+            setFechaCaducidad();
+            rellenarOpciones();
         } else {
             System.out.println("Fail to get Options");
         }
     }
 
-    private void collectCall(Opcion opcion) {
+    private void obtenerCALLS(Opcion opcion) {
         if (listasPorVencimientoCall.containsKey(opcion.Vencimiento)) {
             listasPorVencimientoCall.get(opcion.Vencimiento).add(opcion);
         } else {
@@ -655,7 +649,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    private void collectPut(Opcion opcion) {
+    private void obtenerPUTS(Opcion opcion) {
         if (listasPorVencimientoPut.containsKey(opcion.Vencimiento)) {
             listasPorVencimientoPut.get(opcion.Vencimiento).add(opcion);
         } else {
@@ -665,12 +659,12 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    private void fillOptions() {
-        fillPut(jComboBox2.getItemAt(0).toString());
-        fillCall(jComboBox1.getItemAt(0).toString());
+    private void rellenarOpciones() {
+        rellenarPUT(jComboBox2.getItemAt(0).toString());
+        rellenarCALL(jComboBox1.getItemAt(0).toString());
     }
 
-    private void fillCall(String date) {
+    private void rellenarCALL(String date) {
         ArrayList<Opcion> opcionesCall = listasPorVencimientoCall.get(date);
         DefaultTableModel tablemodel = (DefaultTableModel) TablaOpcionesCALL.getModel();
         tablemodel.setRowCount(opcionesCall.size());
@@ -686,7 +680,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    private void fillPut(String date) {
+    private void rellenarPUT(String date) {
         ArrayList<Opcion> opcionesPut = listasPorVencimientoPut.get(date);
         DefaultTableModel tablemodel = (DefaultTableModel) TablaOpcionesPUT.getModel();
         tablemodel.setRowCount(opcionesPut.size());
@@ -702,7 +696,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    private void setEndDate() {
+    private void setFechaCaducidad() {
         jComboBox2.removeAll();
         jComboBox1.removeAll();
         for (String key : listasPorVencimientoCall.keySet()) {
@@ -711,22 +705,6 @@ public class MainFrame extends javax.swing.JFrame {
         for (String key : listasPorVencimientoPut.keySet()) {
             jComboBox2.addItem(key);
         }
-    }
-
-    private void activateTablesListenner() {
-        TablaOpcionesCALL.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-
-            }
-        });
-        TablaOpcionesPUT.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-
-                System.out.println(TablaOpcionesPUT.getSelectedRow());
-            }
-        });
     }
 
     private Opcion crearOpcion(JTable tabla, int row, boolean put) {

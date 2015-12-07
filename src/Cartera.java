@@ -277,7 +277,7 @@ private boolean añadir = false;
 
     private String calcularGanancia(String compra, String venta) {
         try {
-            return (Float.parseFloat(compra.replace(",", ".")) - Float.parseFloat(venta.replace(",", "."))) + "";
+            return ((Float.parseFloat(compra.replace(".", "").replace(",", ".")) - Float.parseFloat(venta.replace(".", "").replace(",", "."))) + "").replace(".", ",");
         } catch (Exception e) {
 
         }
@@ -285,7 +285,7 @@ private boolean añadir = false;
     }
 
     private String getVentaTotal() {
-        int result = 0;
+        float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
             try{
@@ -294,11 +294,11 @@ private boolean añadir = false;
                 result += 0;
             }
         }
-        return result+"";
+        return (result+"").replace(".", ",");
     }
 
     private String getCompraTotal() {
-        int result = 0;
+        float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
             try{
@@ -307,19 +307,19 @@ private boolean añadir = false;
                 result += 0;
             }
         }
-        return result+"";
+        return (result+"").replace(".", ",");
     }
 
     private String getGananciaTotal() {
-        int result = 0;
+        float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
             try{
-                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString())*Float.parseFloat(Tabla.getValueAt(i, 7).toString());
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 7).toString().replace(",", "."));
             }catch(Exception e){
                 result += 0;
             }
         }
-        return result+"";
+        return (result+"").replace(".", ",");
     }
 }
