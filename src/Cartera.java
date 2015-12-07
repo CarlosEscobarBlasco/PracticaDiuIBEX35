@@ -3,20 +3,26 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.table.DefaultTableModel;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
  *
  * @author Carlos
  */
-public class Cartera extends javax.swing.JPanel {
+public class Cartera extends javax.swing.JInternalFrame {
 
     /**
-     * Creates new form NewJPanel
+     * Creates new form Carter
      */
     public Cartera() {
         initComponents();
         actualizarTabla();
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,23 +33,25 @@ public class Cartera extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        Tabla = new javax.swing.JTable();
+        PrecioVenta = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        PrecioCompra = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        Ganancia = new javax.swing.JTextField();
+        Añadir = new javax.swing.JButton();
+        Decrementar = new javax.swing.JButton();
+        EliminarFila = new javax.swing.JButton();
+        Total = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        Tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
@@ -58,11 +66,17 @@ public class Cartera extends javax.swing.JPanel {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        Tabla.setColumnSelectionAllowed(true);
+        Tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(Tabla);
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        PrecioVenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                PrecioVentaActionPerformed(evt);
             }
         });
 
@@ -70,162 +84,242 @@ public class Cartera extends javax.swing.JPanel {
 
         jLabel2.setText("Precio Compra");
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        PrecioCompra.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                PrecioCompraActionPerformed(evt);
             }
         });
 
         jLabel3.setText("Ganancia");
 
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        Ganancia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                GananciaActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Añadir");
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+        Añadir.setText("Añadir");
+        Añadir.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton1MouseClicked(evt);
+                AñadirMouseClicked(evt);
             }
         });
 
-        jButton2.setText("Decrementar");
+        Decrementar.setText("Decrementar");
+        Decrementar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DecrementarActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Eliminar Fila");
+        EliminarFila.setText("Eliminar Fila");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel4.setText("Total:");
+        Total.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        Total.setText("Total:");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        jMenu1.setText("File");
+
+        jMenuItem1.setText("Guardar");
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Eliminar");
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(Añadir)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(Decrementar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
+                .addComponent(EliminarFila)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel4)
+                .addComponent(Total)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(PrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(PrecioCompra, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Ganancia, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
-                            .addComponent(jLabel4))
+                            .addComponent(Total))
                         .addGap(3, 3, 3)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(PrecioVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(PrecioCompra, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Ganancia, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(23, 23, 23)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(Añadir)
+                    .addComponent(Decrementar)
+                    .addComponent(EliminarFila))
                 .addContainerGap())
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void TablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaMouseClicked
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_TablaMouseClicked
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void PrecioVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrecioVentaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_PrecioVentaActionPerformed
 
-    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+    private void PrecioCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrecioCompraActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PrecioCompraActionPerformed
+
+    private void GananciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GananciaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GananciaActionPerformed
+
+    private void AñadirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AñadirMouseClicked
         añadir = true;
-    }//GEN-LAST:event_jButton1MouseClicked
-    
+    }//GEN-LAST:event_AñadirMouseClicked
+
+    private void DecrementarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DecrementarActionPerformed
+
+    }//GEN-LAST:event_DecrementarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton Añadir;
+    private javax.swing.JButton Decrementar;
+    private javax.swing.JButton EliminarFila;
+    private javax.swing.JTextField Ganancia;
+    private javax.swing.JTextField PrecioCompra;
+    private javax.swing.JTextField PrecioVenta;
+    private javax.swing.JTable Tabla;
+    private javax.swing.JLabel Total;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
-    private boolean añadir=false;
-    private HashMap<Opcion,AtomicInteger> cartera = new HashMap<>();
-    
-    
-    public boolean solicitaValores(){
+private boolean añadir = false;
+    private HashMap<Opcion, AtomicInteger> cartera = new HashMap<>();
+
+    public boolean solicitaValores() {
         return añadir;
     }
-    
-    public void introducirValor(Opcion opcion){
-        añadir =false;
-        if(cartera.containsKey(opcion))cartera.get(opcion).incrementAndGet();
-        else cartera.put(opcion, new AtomicInteger(0));
+
+    public void introducirValor(Opcion opcion) {
+        añadir = false;
+        if (cartera.containsKey(opcion)) {
+            cartera.get(opcion).incrementAndGet();
+        } else {
+            cartera.put(opcion, new AtomicInteger(1));
+        }
         actualizarTabla();
     }
+
     private void actualizarTabla() {
-        DefaultTableModel tablemodel = (DefaultTableModel)jTable1.getModel();
+        DefaultTableModel tablemodel = (DefaultTableModel) Tabla.getModel();
         tablemodel.setRowCount(cartera.size());
         int i = 0;
-        for (Opcion opcion : cartera.keySet()){
-         jTable1.setValueAt(cartera.get(opcion).intValue(), i, 0);
-         jTable1.setValueAt(opcion.Tipo, i, 1);
-         jTable1.setValueAt(opcion.Vencimiento, i, 2);
-         jTable1.setValueAt(opcion.Ejercicio, i, 3);
-         jTable1.setValueAt(opcion.DiaDeCompra, i, 4);
-         jTable1.setValueAt(opcion.Venta_Precio, i, 5);
-         jTable1.setValueAt(opcion.Compra_Precio, i, 6);
-         jTable1.setValueAt(calcularGanancia(opcion.Compra_Precio, opcion.Venta_Precio), i, 7);
-         i++;
+        for (Opcion opcion : cartera.keySet()) {
+            Tabla.setValueAt(cartera.get(opcion).intValue(), i, 0);
+            Tabla.setValueAt(opcion.Tipo, i, 1);
+            Tabla.setValueAt(opcion.Vencimiento, i, 2);
+            Tabla.setValueAt(opcion.Ejercicio, i, 3);
+            Tabla.setValueAt(opcion.DiaDeCompra, i, 4);
+            Tabla.setValueAt(opcion.Venta_Precio, i, 5);
+            Tabla.setValueAt(opcion.Compra_Precio, i, 6);
+            Tabla.setValueAt(calcularGanancia(opcion.Compra_Precio, opcion.Venta_Precio), i, 7);
+            i++;
         }
+        PrecioVenta.setText(getVentaTotal());
+        PrecioCompra.setText(getCompraTotal());
+        Ganancia.setText(getGananciaTotal());
     }
-    
-    private String calcularGanancia(String compra, String venta){
-        try{
-            return (Float.parseFloat(compra.replace(",", "."))-Float.parseFloat(venta.replace(",", ".")))+"";
-        }catch(Exception e){
-            
+
+    private String calcularGanancia(String compra, String venta) {
+        try {
+            return (Float.parseFloat(compra.replace(",", ".")) - Float.parseFloat(venta.replace(",", "."))) + "";
+        } catch (Exception e) {
+
         }
         return "-";
+    }
+
+    private String getVentaTotal() {
+        int result = 0;
+        int nRows = Tabla.getRowCount();
+        for (int i = 0; i < nRows; i++) {
+            try{
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 5).toString().replace(",", "."));
+            }catch(Exception e){
+                result += 0;
+            }
+        }
+        return result+"";
+    }
+
+    private String getCompraTotal() {
+        int result = 0;
+        int nRows = Tabla.getRowCount();
+        for (int i = 0; i < nRows; i++) {
+            try{
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 6).toString().replace(",", "."));
+            }catch(Exception e){
+                result += 0;
+            }
+        }
+        return result+"";
+    }
+
+    private String getGananciaTotal() {
+        int result = 0;
+        int nRows = Tabla.getRowCount();
+        for (int i = 0; i < nRows; i++) {
+            try{
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString())*Float.parseFloat(Tabla.getValueAt(i, 7).toString());
+            }catch(Exception e){
+                result += 0;
+            }
+        }
+        return result+"";
     }
 }
