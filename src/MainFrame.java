@@ -459,7 +459,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void AñadirCarteraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AñadirCarteraActionPerformed
         numeroDeCartera++;
-        Cartera cartera = new Cartera();
+        Cartera cartera = new Cartera(this);
         cartera.setTitle("Cartera " + numeroDeCartera);
         cartera.setSize(650, 250);
         cartera.setClosable(true);
@@ -507,7 +507,7 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         numeroDeCartera++;
-        Cartera cartera = new Cartera();
+        Cartera cartera = new Cartera(this);
         cartera.setTitle("Cartera " + numeroDeCartera);
         cartera.setSize(650, 250);
         cartera.setClosable(true);
@@ -533,6 +533,7 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         }catch(Exception e){}
+        cartera.actualizarValores();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
@@ -754,12 +755,16 @@ public class MainFrame extends javax.swing.JFrame {
         Opcion opcion = new Opcion();
         Calendar calendar = Calendar.getInstance();
         opcion.Tipo = put ? "PUT" : "CALL";
-        opcion.Vencimiento = (String) tabla.getValueAt(row, 0);
+        opcion.Vencimiento = put ? jComboBox2.getSelectedItem().toString():jComboBox1.getSelectedItem().toString();
         opcion.Ejercicio = (String) tabla.getValueAt(row, 0);
         opcion.DiaDeCompra = calendar.getTime().toLocaleString().substring(0,11).replace("-", " ");
         opcion.Venta_Precio = (String) tabla.getValueAt(row, 3);
         opcion.Compra_Precio = (String) tabla.getValueAt(row, 2);
         return opcion;
     }
-
+    
+    public ArrayList<Opcion> obtenerTodasLasOpciones(){
+        return opciones.Opciones;
+    }
+    
 }

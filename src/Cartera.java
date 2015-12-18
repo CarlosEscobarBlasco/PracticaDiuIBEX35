@@ -1,11 +1,15 @@
+
+import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JFileChooser;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -21,13 +25,17 @@ public class Cartera extends javax.swing.JInternalFrame {
 
     private boolean eliminar;
     private boolean decrementar;
+    private MainFrame mainFrame;
 
     /**
      * Creates new form Carter
+     * @param frame
      */
-    public Cartera() {
+    public Cartera(MainFrame frame) {
         initComponents();
         actualizarTabla();
+        mainFrame=frame;
+        recalcularValores();
     }
 
     /**
@@ -269,10 +277,10 @@ public class Cartera extends javax.swing.JInternalFrame {
             outFile = new BufferedWriter(new FileWriter(fileName));
             PrintWriter printWriter = new PrintWriter(outFile);
             for (int i = 0; i < Tabla.getRowCount(); i++) {
-                for (int j = 0; j < Tabla.getColumnCount()-3; j++) {
-                    printWriter.print(Tabla.getValueAt(i, j)+"%");
+                for (int j = 0; j < Tabla.getColumnCount() - 3; j++) {
+                    printWriter.print(Tabla.getValueAt(i, j) + "%");
                 }
-                printWriter.print(Tabla.getValueAt(i, Tabla.getColumnCount()-3)+"\n");
+                printWriter.print(Tabla.getValueAt(i, Tabla.getColumnCount() - 3) + "\n");
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -389,5 +397,30 @@ private boolean añadir = false;
             }
         }
         return (result + "").replace(".", ",");
+    }
+
+    public void actualizarValores() {
+        ArrayList<Opcion> opciones = mainFrame.obtenerTodasLasOpciones();
+        for (int i = 0; i < Tabla.getRowCount(); i++) {
+            Opcion opcion = new Opcion();
+            opcion.Tipo=Tabla.getValueAt(i, 1).toString();
+            opcion.Vencimiento=Tabla.getValueAt(i, 2).toString();
+            opcion.Ejercicio=Tabla.getValueAt(i, 3).toString();
+            for (Opcion opcion2 : opciones) {
+                if(opcion2.equals(opcion)){
+                    Tabla.setValueAt(opcion2.Compra_Precio, i, 6);
+                    Tabla.setValueAt(calcularGanancia(opcion2.Compra_Precio, opcion2.Venta_Precio), i, 7);
+                }
+            }
+        }
+        PrecioVenta.setText(getVentaTotal());
+        PrecioCompra.setText(getCompraTotal());
+        Ganancia.setText(getGananciaTotal());
+    }
+
+    private void recalcularValores() {
+        new Timer(180000, (ActionEvent evt) -> {
+            actualizarValores();
+        }).start(); //3 min
     }
 }
