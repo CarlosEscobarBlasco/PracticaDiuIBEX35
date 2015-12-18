@@ -1,10 +1,14 @@
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -197,7 +201,7 @@ public class MainFrame extends javax.swing.JFrame {
             VentanaFuturosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(VentanaFuturosLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 148, Short.MAX_VALUE))
+                .addGap(0, 152, Short.MAX_VALUE))
         );
 
         VentanaOpcionesCALL.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -267,7 +271,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -338,7 +342,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -421,6 +425,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu1.add(AñadirCartera);
 
         jMenuItem1.setText("Abrir Cartera");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         BarraMenu.add(jMenu1);
@@ -450,10 +459,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void AñadirCarteraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AñadirCarteraActionPerformed
         numeroDeCartera++;
-        //JInternalFrame ventana = new JInternalFrame();
         Cartera cartera = new Cartera();
         cartera.setTitle("Cartera " + numeroDeCartera);
-        //cartera.add(cartera);
         cartera.setSize(650, 250);
         cartera.setClosable(true);
         cartera.setIconifiable(true);
@@ -491,6 +498,42 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
      }//GEN-LAST:event_TablaOpcionesCALLMouseClicked
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(null);
+        int actionDialog = fileChooser.showOpenDialog(this);
+        if (actionDialog != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        numeroDeCartera++;
+        Cartera cartera = new Cartera();
+        cartera.setTitle("Cartera " + numeroDeCartera);
+        cartera.setSize(650, 250);
+        cartera.setClosable(true);
+        cartera.setIconifiable(true);
+        cartera.setVisible(true);
+        carteras.add(cartera);
+        Escritorio.add(cartera);
+        try{
+            File file = fileChooser.getSelectedFile();
+            FileReader fileReader = new FileReader(file);
+            BufferedReader buffer = new BufferedReader(fileReader);
+            String line;
+            while((line=buffer.readLine()) != null){
+                String[] lineElements = line.split("%");
+                for (int i = 0; i < Integer.parseInt(lineElements[0]); i++) {
+                    Opcion opcion = new Opcion();
+                    opcion.Tipo = lineElements[1];
+                    opcion.Vencimiento = lineElements[2];
+                    opcion.Ejercicio = lineElements[3];
+                    opcion.DiaDeCompra = lineElements[4];
+                    opcion.Venta_Precio = lineElements[5];
+                    cartera.introducirValor(opcion);
+                }
+            }
+        }catch(Exception e){}
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments

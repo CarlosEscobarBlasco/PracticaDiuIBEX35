@@ -1,6 +1,11 @@
-
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.JFileChooser;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -8,12 +13,14 @@ import javax.swing.table.DefaultTableModel;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Carlos
  */
 public class Cartera extends javax.swing.JInternalFrame {
+
+    private boolean eliminar;
+    private boolean decrementar;
 
     /**
      * Creates new form Carter
@@ -113,6 +120,11 @@ public class Cartera extends javax.swing.JInternalFrame {
         });
 
         EliminarFila.setText("Eliminar Fila");
+        EliminarFila.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                EliminarFilaMouseClicked(evt);
+            }
+        });
 
         Total.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         Total.setText("Total:");
@@ -120,6 +132,11 @@ public class Cartera extends javax.swing.JInternalFrame {
         jMenu1.setText("File");
 
         jMenuItem1.setText("Guardar");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Eliminar");
@@ -195,7 +212,23 @@ public class Cartera extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void TablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaMouseClicked
-
+        if (eliminar) {
+            Opcion opcion = new Opcion();
+            opcion.Tipo = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 1);
+            opcion.Ejercicio = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 3);
+            opcion.Vencimiento = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 2);
+            cartera.remove(opcion);
+            actualizarTabla();
+        } else if (decrementar) {
+            Opcion opcion = new Opcion();
+            opcion.Tipo = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 1);
+            opcion.Ejercicio = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 3);
+            opcion.Vencimiento = (String) Tabla.getValueAt(Tabla.getSelectedRow(), 2);
+            if (cartera.get(opcion).decrementAndGet() == 0) {
+                cartera.remove(opcion);
+            }
+            actualizarTabla();
+        }
     }//GEN-LAST:event_TablaMouseClicked
 
     private void PrecioVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrecioVentaActionPerformed
@@ -215,8 +248,43 @@ public class Cartera extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_AñadirMouseClicked
 
     private void DecrementarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DecrementarActionPerformed
-
+        decrementar = true;
     }//GEN-LAST:event_DecrementarActionPerformed
+
+    private void EliminarFilaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EliminarFilaMouseClicked
+        eliminar = true;
+    }//GEN-LAST:event_EliminarFilaMouseClicked
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        final JFileChooser SaveAs = new JFileChooser();
+        SaveAs.setApproveButtonText("Save");
+        int actionDialog = SaveAs.showOpenDialog(this);
+        if (actionDialog != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File fileName = new File(SaveAs.getSelectedFile() + ".txt");
+        BufferedWriter outFile = null;
+        try {
+            outFile = new BufferedWriter(new FileWriter(fileName));
+            PrintWriter printWriter = new PrintWriter(outFile);
+            for (int i = 0; i < Tabla.getRowCount(); i++) {
+                for (int j = 0; j < Tabla.getColumnCount()-3; j++) {
+                    printWriter.print(Tabla.getValueAt(i, j)+"%");
+                }
+                printWriter.print(Tabla.getValueAt(i, Tabla.getColumnCount()-3)+"\n");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (outFile != null) {
+                try {
+                    outFile.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -288,38 +356,38 @@ private boolean añadir = false;
         float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
-            try{
-                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 5).toString().replace(",", "."));
-            }catch(Exception e){
+            try {
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", ".")) * Float.parseFloat(Tabla.getValueAt(i, 5).toString().replace(",", "."));
+            } catch (Exception e) {
                 result += 0;
             }
         }
-        return (result+"").replace(".", ",");
+        return (result + "").replace(".", ",");
     }
 
     private String getCompraTotal() {
         float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
-            try{
-                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 6).toString().replace(",", "."));
-            }catch(Exception e){
+            try {
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", ".")) * Float.parseFloat(Tabla.getValueAt(i, 6).toString().replace(",", "."));
+            } catch (Exception e) {
                 result += 0;
             }
         }
-        return (result+"").replace(".", ",");
+        return (result + "").replace(".", ",");
     }
 
     private String getGananciaTotal() {
         float result = 0;
         int nRows = Tabla.getRowCount();
         for (int i = 0; i < nRows; i++) {
-            try{
-                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", "."))*Float.parseFloat(Tabla.getValueAt(i, 7).toString().replace(",", "."));
-            }catch(Exception e){
+            try {
+                result += Float.parseFloat(Tabla.getValueAt(i, 0).toString().replace(",", ".")) * Float.parseFloat(Tabla.getValueAt(i, 7).toString().replace(",", "."));
+            } catch (Exception e) {
                 result += 0;
             }
         }
-        return (result+"").replace(".", ",");
+        return (result + "").replace(".", ",");
     }
 }
