@@ -1,60 +1,51 @@
-import java.awt.PopupMenu;
+
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import javax.swing.JFileChooser;
+import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Juan
- */
 public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+        this.carteras = new ArrayList<>();
+        this.listasPorVencimientoCall = new HashMap<>();
+        this.listasPorVencimientoPut = new HashMap<>();
         initComponents();
-        
+
         setDate();
-        Timer timDate = new Timer(20000,new ActionListener(){ // 20 segundos
-            @Override
-            public void actionPerformed(ActionEvent evt){
-                setDate();
-            }
-        });
+        Timer timDate = new Timer(20000, (ActionEvent evt) -> {
+            setDate();
+        } // 20 segundos
+        );
         timDate.start();
-        
+
         CollectData();
-        Timer timData = new Timer(180000,new ActionListener(){ // 3 minutos
-            @Override
-            public void actionPerformed(ActionEvent evt){
-                CollectData();
-            }
-        });
+        Timer timData = new Timer(180000, (ActionEvent evt) -> {
+            CollectData();
+        } // 3 minutos
+        );
         timData.start();
-        
-        CollectOptions();
-        Timer timeOption = new Timer(180000,new ActionListener(){ // 3 minutos
-            @Override
-            public void actionPerformed(ActionEvent evt){
-                CollectOptions();
-            }
-        });
+
+        obtenerOpciones();
+        Timer timeOption = new Timer(180000, (ActionEvent evt) -> {
+            obtenerOpciones();
+        } // 3 minutos
+        );
         timeOption.start();
-        
     }
 
     /**
@@ -90,6 +81,8 @@ public class MainFrame extends javax.swing.JFrame {
         Fecha = new javax.swing.JTextField();
         BarraMenu = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        AñadirCartera = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -123,6 +116,9 @@ public class MainFrame extends javax.swing.JFrame {
         VentanaContado.setIconifiable(true);
         VentanaContado.setTitle("Contado/Spot");
         VentanaContado.setToolTipText("Precio de Contado/Spot");
+        VentanaContado.setAlignmentX(0.0F);
+        VentanaContado.setAlignmentY(0.0F);
+        VentanaContado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         VentanaContado.setVisible(true);
 
         TablaContado.setModel(new javax.swing.table.DefaultTableModel(
@@ -205,7 +201,7 @@ public class MainFrame extends javax.swing.JFrame {
             VentanaFuturosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(VentanaFuturosLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 96, Short.MAX_VALUE))
+                .addGap(0, 152, Short.MAX_VALUE))
         );
 
         VentanaOpcionesCALL.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -249,6 +245,11 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        TablaOpcionesCALL.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaOpcionesCALLMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(TablaOpcionesCALL);
 
         javax.swing.GroupLayout VentanaOpcionesCALLLayout = new javax.swing.GroupLayout(VentanaOpcionesCALL.getContentPane());
@@ -270,7 +271,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -315,6 +316,11 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        TablaOpcionesPUT.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaOpcionesPUTMouseClicked(evt);
+            }
+        });
         jScrollPane4.setViewportView(TablaOpcionesPUT);
 
         javax.swing.GroupLayout VentanaOpcionesPUTLayout = new javax.swing.GroupLayout(VentanaOpcionesPUT.getContentPane());
@@ -336,7 +342,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -345,21 +351,21 @@ public class MainFrame extends javax.swing.JFrame {
         EscritorioLayout.setHorizontalGroup(
             EscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(EscritorioLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addGroup(EscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(EscritorioLayout.createSequentialGroup()
+                        .addGap(11, 11, 11)
                         .addComponent(VentanaContado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(EscritorioLayout.createSequentialGroup()
-                        .addGap(4, 4, 4)
                         .addGroup(EscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(VentanaFuturos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(EscritorioLayout.createSequentialGroup()
                                 .addComponent(VentanaOpcionesPUT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(VentanaOpcionesCALL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         EscritorioLayout.setVerticalGroup(
@@ -409,6 +415,23 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         jMenu1.setText("File");
+
+        AñadirCartera.setText("Añadir Cartera");
+        AñadirCartera.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AñadirCarteraActionPerformed(evt);
+            }
+        });
+        jMenu1.add(AñadirCartera);
+
+        jMenuItem1.setText("Abrir Cartera");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
         BarraMenu.add(jMenu1);
 
         jMenu2.setText("Edit");
@@ -434,15 +457,84 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void AñadirCarteraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AñadirCarteraActionPerformed
+        numeroDeCartera++;
+        Cartera cartera = new Cartera(this);
+        cartera.setTitle("Cartera " + numeroDeCartera);
+        cartera.setSize(650, 250);
+        cartera.setClosable(true);
+        cartera.setIconifiable(true);
+        cartera.setVisible(true);
+        carteras.add(cartera);
+        Escritorio.add(cartera);
+    }//GEN-LAST:event_AñadirCarteraActionPerformed
+
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
-        if(jComboBox2.getSelectedItem().toString()!=null)
-        fillPut(jComboBox2.getSelectedItem().toString());
+        if (jComboBox2.getSelectedItem().toString() != null) {
+            rellenarPUT(jComboBox2.getSelectedItem().toString());
+        }
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        if(jComboBox1.getSelectedItem().toString()!=null)
-        fillPut(jComboBox1.getSelectedItem().toString());
+        if (jComboBox1.getSelectedItem().toString() != null) {
+            rellenarCALL(jComboBox1.getSelectedItem().toString());
+        }
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void TablaOpcionesPUTMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaOpcionesPUTMouseClicked
+        int row = TablaOpcionesPUT.getSelectedRow();
+        for (Cartera cartera : carteras) {
+            if (cartera.solicitaValores()) {
+                cartera.introducirValor(crearOpcion(TablaOpcionesPUT, row, true));
+            }
+        }
+    }//GEN-LAST:event_TablaOpcionesPUTMouseClicked
+
+    private void TablaOpcionesCALLMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaOpcionesCALLMouseClicked
+        int row = TablaOpcionesCALL.getSelectedRow();
+        for (Cartera cartera : carteras) {
+            if (cartera.solicitaValores()) {
+                cartera.introducirValor(crearOpcion(TablaOpcionesCALL, row, false));
+            }
+        }
+     }//GEN-LAST:event_TablaOpcionesCALLMouseClicked
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(null);
+        int actionDialog = fileChooser.showOpenDialog(this);
+        if (actionDialog != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        numeroDeCartera++;
+        Cartera cartera = new Cartera(this);
+        cartera.setTitle("Cartera " + numeroDeCartera);
+        cartera.setSize(650, 250);
+        cartera.setClosable(true);
+        cartera.setIconifiable(true);
+        cartera.setVisible(true);
+        carteras.add(cartera);
+        Escritorio.add(cartera);
+        try{
+            File file = fileChooser.getSelectedFile();
+            FileReader fileReader = new FileReader(file);
+            BufferedReader buffer = new BufferedReader(fileReader);
+            String line;
+            while((line=buffer.readLine()) != null){
+                String[] lineElements = line.split("%");
+                for (int i = 0; i < Integer.parseInt(lineElements[0]); i++) {
+                    Opcion opcion = new Opcion();
+                    opcion.Tipo = lineElements[1];
+                    opcion.Vencimiento = lineElements[2];
+                    opcion.Ejercicio = lineElements[3];
+                    opcion.DiaDeCompra = lineElements[4];
+                    opcion.Venta_Precio = lineElements[5];
+                    cartera.introducirValor(opcion);
+                }
+            }
+        }catch(Exception e){}
+        cartera.actualizarValores();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -480,6 +572,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem AñadirCartera;
     private javax.swing.JMenuBar BarraMenu;
     private javax.swing.JDesktopPane Escritorio;
     private javax.swing.JTextField Fecha;
@@ -499,6 +592,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -507,15 +601,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     // End of variables declaration//GEN-END:variables
 
-private final MEFF_Contado contado = new MEFF_Contado();
-private final MEFF_Futuros futuros = new MEFF_Futuros();
-private final MEFF_Opciones opciones = new MEFF_Opciones();
-private int contadorCall=0;
-private int contadorPut=0;
-private HashMap<String,ArrayList<Opcion>> listasPorVencimientoCall = new HashMap<>();
-private HashMap<String,ArrayList<Opcion>> listasPorVencimientoPut = new HashMap<>();
+    private final MEFF_Contado contado = new MEFF_Contado();
+    private final MEFF_Futuros futuros = new MEFF_Futuros();
+    private final MEFF_Opciones opciones = new MEFF_Opciones();
+    private final HashMap<String, ArrayList<Opcion>> listasPorVencimientoCall;
+    private final HashMap<String, ArrayList<Opcion>> listasPorVencimientoPut;
+    private int numeroDeCartera = 0;
+    private final ArrayList<Cartera> carteras;
 
-private void setDate(){
+    private void setDate() {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm ");
         String formatedDate = sdf.format(date);
@@ -523,46 +617,38 @@ private void setDate(){
         Fecha.setText(formatedDate);
     }
 
-private Float toFloat(String texto){
-        
+    private Float toFloat(String texto) {
+
         texto = texto.replace(".", "");
         texto = texto.replace(",", ".");
         return Float.valueOf(texto);
     }
 
-private void CollectData(){
-        
-        //Notificaciones.setText("Recolectando datos ....");   
-
-        // actualiza la tabla de contado
+    private void CollectData() {
         contado.getSpot();
         TableModel model = TablaContado.getModel();
         TablaContado.setValueAt(contado.Spot, 0, 0);
-        //TablaContado.setValueAt(contado.Diferencia, 0, 1);
         TablaContado.setValueAt(contado.Anterior, 0, 2);
         TablaContado.setValueAt(contado.Maximo, 0, 3);
         TablaContado.setValueAt(contado.Minimo, 0, 4);
         TablaContado.setValueAt(contado.Fecha, 0, 5);
         TablaContado.setValueAt(contado.Hora, 0, 6);
-        
+
         Float diferencia = toFloat(contado.Diferencia);
-        if(diferencia > 0){
-            model.setValueAt("<html><font color='green'>"+diferencia+"</font></html>", 0, 1);
+        if (diferencia > 0) {
+            model.setValueAt("<html><font color='green'>" + diferencia + "</font></html>", 0, 1);
+        } else if (diferencia < 0) {
+            model.setValueAt("<html><font color='red'>" + diferencia + "</font></html>", 0, 1);
+        } else {
+            model.setValueAt("<html><font color='black'>" + diferencia + "</font></html>", 0, 1);
         }
-        else if(diferencia < 0){
-             model.setValueAt("<html><font color='red'>"+diferencia+"</font></html>", 0, 1);   
-        }
-        else{
-            model.setValueAt("<html><font color='black'>"+diferencia+"</font></html>", 0, 1);
-        }
-        
+
         futuros.getFutures();
         int nfuturos = futuros.Futuros.size();
-        DefaultTableModel tablemodel = (DefaultTableModel)TablaFuturos.getModel();
+        DefaultTableModel tablemodel = (DefaultTableModel) TablaFuturos.getModel();
         tablemodel.setRowCount(nfuturos);
-       
-        
-        for(int i=0;i<nfuturos;i++){
+
+        for (int i = 0; i < nfuturos; i++) {
             Futuro f = futuros.Futuros.get(i);
             TablaFuturos.setValueAt(f.Vencimiento, i, 0);
             TablaFuturos.setValueAt(f.Compra_Vol, i, 1);
@@ -580,48 +666,51 @@ private void CollectData(){
         //Notificaciones.setText("Datos disponibles");
     }
 
-    private void CollectOptions() {
-        if(opciones.getOptions()){
+    private void obtenerOpciones() {
+        if (opciones.getOptions()) {
             int nOpciones = opciones.Opciones.size();
             for (int i = 0; i < nOpciones; i++) {
-                if(opciones.Opciones.get(i).Tipo.equals("CALL"))collectCall(opciones.Opciones.get(i));
-                else collectPut(opciones.Opciones.get(i));
+                if (opciones.Opciones.get(i).Tipo.equals("CALL")) {
+                    obtenerCALLS(opciones.Opciones.get(i));
+                } else {
+                    obtenerPUTS(opciones.Opciones.get(i));
+                }
             }
-            setEndDate();
-            fillOptions();
-        }else{
+            setFechaCaducidad();
+            rellenarOpciones();
+        } else {
             System.out.println("Fail to get Options");
         }
     }
 
-    private void collectCall(Opcion opcion) {
-        if(listasPorVencimientoCall.containsKey(opcion.Vencimiento)){
+    private void obtenerCALLS(Opcion opcion) {
+        if (listasPorVencimientoCall.containsKey(opcion.Vencimiento)) {
             listasPorVencimientoCall.get(opcion.Vencimiento).add(opcion);
-        }else{
+        } else {
             ArrayList<Opcion> arrayList = new ArrayList<>();
             arrayList.add(opcion);
-            listasPorVencimientoCall.put(opcion.Vencimiento,arrayList);
+            listasPorVencimientoCall.put(opcion.Vencimiento, arrayList);
         }
     }
 
-    private void collectPut(Opcion opcion) {
-        if(listasPorVencimientoPut.containsKey(opcion.Vencimiento)){
+    private void obtenerPUTS(Opcion opcion) {
+        if (listasPorVencimientoPut.containsKey(opcion.Vencimiento)) {
             listasPorVencimientoPut.get(opcion.Vencimiento).add(opcion);
-        }else{
+        } else {
             ArrayList<Opcion> arrayList = new ArrayList<>();
             arrayList.add(opcion);
-            listasPorVencimientoPut.put(opcion.Vencimiento,arrayList);
-        }  
+            listasPorVencimientoPut.put(opcion.Vencimiento, arrayList);
+        }
     }
 
-    private void fillOptions() {
-        fillPut(jComboBox2.getItemAt(0).toString());
-        fillCall(jComboBox1.getItemAt(0).toString());      
+    private void rellenarOpciones() {
+        rellenarPUT(jComboBox2.getItemAt(0).toString());
+        rellenarCALL(jComboBox1.getItemAt(0).toString());
     }
 
-    private void fillCall(String date) {
+    private void rellenarCALL(String date) {
         ArrayList<Opcion> opcionesCall = listasPorVencimientoCall.get(date);
-        DefaultTableModel tablemodel = (DefaultTableModel)TablaOpcionesCALL.getModel();
+        DefaultTableModel tablemodel = (DefaultTableModel) TablaOpcionesCALL.getModel();
         tablemodel.setRowCount(opcionesCall.size());
         for (int i = 0; i < opcionesCall.size(); i++) {
             TablaOpcionesCALL.setValueAt(opcionesCall.get(i).Ejercicio, i, 0);
@@ -635,9 +724,9 @@ private void CollectData(){
         }
     }
 
-    private void fillPut(String date) {
+    private void rellenarPUT(String date) {
         ArrayList<Opcion> opcionesPut = listasPorVencimientoPut.get(date);
-        DefaultTableModel tablemodel = (DefaultTableModel)TablaOpcionesPUT.getModel();
+        DefaultTableModel tablemodel = (DefaultTableModel) TablaOpcionesPUT.getModel();
         tablemodel.setRowCount(opcionesPut.size());
         for (int i = 0; i < opcionesPut.size(); i++) {
             TablaOpcionesPUT.setValueAt(opcionesPut.get(i).Ejercicio, i, 0);
@@ -651,15 +740,31 @@ private void CollectData(){
         }
     }
 
-    private void setEndDate() {
+    private void setFechaCaducidad() {
         jComboBox2.removeAll();
         jComboBox1.removeAll();
         for (String key : listasPorVencimientoCall.keySet()) {
-            jComboBox1.addItem(key); 
+            jComboBox1.addItem(key);
         }
         for (String key : listasPorVencimientoPut.keySet()) {
             jComboBox2.addItem(key);
         }
     }
 
+    private Opcion crearOpcion(JTable tabla, int row, boolean put) {
+        Opcion opcion = new Opcion();
+        Calendar calendar = Calendar.getInstance();
+        opcion.Tipo = put ? "PUT" : "CALL";
+        opcion.Vencimiento = put ? jComboBox2.getSelectedItem().toString():jComboBox1.getSelectedItem().toString();
+        opcion.Ejercicio = (String) tabla.getValueAt(row, 0);
+        opcion.DiaDeCompra = calendar.getTime().toLocaleString().substring(0,11).replace("-", " ");
+        opcion.Venta_Precio = (String) tabla.getValueAt(row, 3);
+        opcion.Compra_Precio = (String) tabla.getValueAt(row, 2);
+        return opcion;
+    }
+    
+    public ArrayList<Opcion> obtenerTodasLasOpciones(){
+        return opciones.Opciones;
+    }
+    
 }
